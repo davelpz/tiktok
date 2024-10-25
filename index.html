@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>Clock Solitaire</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #333;
+        }
+        #game {
+            /* Container to maintain aspect ratio */
+            max-width: 100vmin;
+            max-height: 100vmin;
+        }
+    </style>
+</head>
+<body>
+    <div id="game"></div>
+    <script>
+    class ClockSolitaire extends Phaser.Scene {
+        constructor() {
+            super({ key: 'ClockSolitaire' });
+        }
+
+        preload() {
+            // Create loading bar
+            let progressBar = this.add.graphics();
+            let progressBox = this.add.graphics();
+            progressBox.fillStyle(0x222222, 0.8);
+            progressBox.fillRect(240, 270, 320, 50);
+
+            // Loading text
+            let width = this.cameras.main.width;
+            let height = this.cameras.main.height;
+            let loadingText = this.add.text(width / 2, height / 2 - 50, 'Loading...', {
+                font: '20px monospace',
+                fill: '#ffffff'
+            });
+            loadingText.setOrigin(0.5, 0.5);
+
+            // Loading progress tracking
+            this.load.on('progress', function (value) {
+                progressBar.clear();
+                progressBar.fillStyle(0x9932cc, 1);
+                progressBar.fillRect(250, 280, 300 * value, 30);
+            });
+
+            this.load.on('complete', function () {
+                progressBar.destroy();
+                progressBox.destroy();
+                loadingText.destroy();
+            });
+
+            // Load all card fronts
+            // Number cards (2-10)
+            const suits = ['clubs', 'diamonds', 'hearts', 'spades'];
+            const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10'];
+            const faceCards = ['ace', 'jack', 'queen', 'king'];
+
+            // Load numbered cards
+            suits.forEach(suit => {
+                values.forEach(value => {
+                    this.load.image(
+                        `card_${suit}_${value}`,
+                        `assets/cards/fronts/${suit}_${value}.png`
+                    );
+                });
+            });
+
+            // Load face cards
+            suits.forEach(suit => {
+                faceCards.forEach(face => {
+                    this.load.image(
+                        `card_${suit}_${face}`,
+                        `assets/cards/fronts/${suit}_${face}.png`
+                    );
+                });
+            });
+
+            // Load jokers
+            this.load.image('card_joker_red', 'assets/cards/fronts/joker_red.png');
+            this.load.image('card_joker_black', 'assets/cards/fronts/joker_black.png');
+
+            // Load card backs
+            const backs = [
+                'abstract', 'abstract_clouds', 'abstract_scene',
+                'astronaut', 'blue', 'blue2', 'castle', 'cars',
+                'fish', 'frog', 'red', 'red2'
+            ];
+
+            backs.forEach(back => {
+                this.load.image(
+                    `cardback_${back}`,
+                    `assets/cards/backs/${back}.png`
+                );
+            });
+        }
+
+        create() {
+            // Test that loading worked by displaying a card
+            const testCard = this.add.image(
+                this.cameras.main.centerX,
+                this.cameras.main.centerY,
+                'card_clubs_2'
+            );
+            testCard.setScale(1); // Cards are already at proper resolution
+        }
+    }
+
+    // Calculate the game size based on viewport
+    function getGameSize() {
+        const size = Math.min(window.innerWidth, window.innerHeight);
+        return {
+            width: size,
+            height: size
+        };
+    }
+
+    const gameSize = getGameSize();
+    const config = {
+        type: Phaser.AUTO,
+        parent: 'game',
+        width: gameSize.width,
+        height: gameSize.height,
+        backgroundColor: '#076324', // Green felt color
+        scene: ClockSolitaire,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                debug: false,
+                gravity: { y: 0 } // No gravity needed for cards
+            }
+        }
+    };
+
+    const game = new Phaser.Game(config);
+
+    // Handle responsive resizing
+    window.addEventListener('resize', () => {
+        const newSize = getGameSize();
+        game.scale.resize(newSize.width, newSize.height);
+    });
+    </script>
+</body>
+</html>
