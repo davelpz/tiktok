@@ -9,56 +9,71 @@ class Deck {
         const suits = ['clubs', 'diamonds', 'hearts', 'spades'];
         const values = ['ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king'];
 
+        // Create a hit zone for the deck
+        this.hitZone = scene.add.rectangle(x, y, 140, 190, 0x00ff00, 0);
+        this.hitZone.setInteractive();
+        this.hitZone.on('pointerdown', () => {
+            this.handleCardClick();
+        });
+
         suits.forEach(suit => {
             values.forEach(value => {
                 const card = new Card(scene, x, y, suit, value);
                 card.setInDeck(true);
-
-                // Add click handler for top card
-                card.on('pointerdown', () => {
-                    if (card.isInDeck && this.isTopCard(card)) {
-                        this.handleCardClick();
-                    }
-                });
-
                 this.cards.push(card);
             });
         });
 
         this.shuffle();
+
+        // Debug text for development
+        this.debugText = scene.add.text(10, 50, '', {
+            font: '16px Arial',
+            fill: '#ffffff'
+        });
+        this.updateDebugText();
+    }
+
+    updateDebugText() {
+        this.debugText.setText(`Cards in deck: ${this.cards.length}\nDealt cards: ${this.dealtCards.length}`);
     }
 
     shuffle() {
-        // Fisher-Yates shuffle algorithm
         for (let i = this.cards.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
-
-            // Update card positions to maintain stack appearance
-            this.cards[i].setPosition(this.deckX, this.deckY);
-            this.cards[j].setPosition(this.deckX, this.deckY);
         }
 
-        // After shuffling, update all cards' positions
+        // Update all cards' positions
         this.cards.forEach((card, index) => {
             card.setPosition(this.deckX, this.deckY);
             card.setHomePosition(this.deckX, this.deckY);
+            // Bring later cards to top of the display list
+            this.scene.children.bringToTop(card);
         });
     }
 
-    isTopCard(card) {
-        return this.cards.length > 0 && this.cards[this.cards.length - 1] === card;
-    }
-
     handleCardClick() {
+        console.log('Deck clicked!'); // Debug log
         const card = this.dealCard();
         if (card) {
-            card.setPosition(
-                this.deckX + 150,  // Deal to the right of the deck
-                this.deckY
-            );
-            card.setHomePosition(this.deckX + 150, this.deckY);
-            card.flip();
+            const targetX = this.deckX + 200;
+            const targetY = this.deckY;
+
+            // Animate the card being dealt
+            this.scene.tweens.add({
+                targets: card,
+                x: targetX,
+                y: targetY,
+                duration: 200,
+                ease: 'Power1',
+                onComplete: () => {
+                    card.flip();
+                    card.setHomePosition(targetX, targetY);
+                }
+            });
+
+            this.updateDebugText();
         }
     }
 
@@ -67,6 +82,7 @@ class Deck {
             const card = this.cards.pop();
             card.setInDeck(false);
             this.dealtCards.push(card);
+            this.scene.children.bringToTop(card);
             return card;
         }
         return null;
@@ -84,7 +100,6 @@ class Deck {
         const cards = this.dealCards(4);
         cards.forEach((card, index) => {
             if (card) {
-                // Slightly offset each card in the stack
                 card.setPosition(x, y + (index * 2));
                 card.setHomePosition(x, y + (index * 2));
             }
@@ -117,6 +132,7 @@ class Deck {
 
         this.scene.time.delayedCall(400, () => {
             this.shuffle();
+            this.updateDebugText();
         });
     }
 
