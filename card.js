@@ -22,7 +22,7 @@ class Card extends Phaser.GameObjects.Container {
 
         // Set up input handling
         this.setSize(this.front.width, this.front.height);
-        this.setInteractive({ useHandCursor: true });  // Make it obvious card is clickable
+        this.setInteractive({useHandCursor: true});  // Make it obvious card is clickable
 
         // Debug bounds
         this.debugBounds = scene.add.rectangle(0, 0, this.front.width, this.front.height, 0xff0000, 0.2);
@@ -33,19 +33,19 @@ class Card extends Phaser.GameObjects.Container {
         this.originalX = x;
         this.originalY = y;
 
-        console.log(`Created card: ${suit} ${value}`);  // Debug log
+        //console.log(`Created card: ${suit} ${value}`);  // Debug log
     }
 
     enableDragging() {
-        this.setInteractive({ draggable: true, useHandCursor: true });
+        this.setInteractive({draggable: true, useHandCursor: true});
         this.setupDragEvents();
-        console.log(`Dragging enabled for card: ${this.suit} ${this.value}`);  // Debug log
+        //console.log(`Dragging enabled for card: ${this.suit} ${this.value}`);  // Debug log
     }
 
     disableDragging() {
         this.disableInteractive();
-        this.setInteractive({ useHandCursor: true });  // Keep it clickable but not draggable
-        console.log(`Dragging disabled for card: ${this.suit} ${this.value}`);  // Debug log
+        this.setInteractive({useHandCursor: true});  // Keep it clickable but not draggable
+        //console.log(`Dragging disabled for card: ${this.suit} ${this.value}`);  // Debug log
     }
 
     setupDragEvents() {
@@ -68,6 +68,10 @@ class Card extends Phaser.GameObjects.Container {
     flip() {
         if (this.scene.tweens.isTweening(this)) return;
 
+        // Store current scale
+        const currentScaleX = this.scaleX;
+        const currentScaleY = this.scaleY;
+
         this.scene.tweens.add({
             targets: this,
             scaleX: 0,
@@ -80,7 +84,7 @@ class Card extends Phaser.GameObjects.Container {
 
                 this.scene.tweens.add({
                     targets: this,
-                    scaleX: 1,
+                    scaleX: currentScaleX,
                     duration: 150,
                     ease: 'Linear'
                 });
@@ -112,12 +116,17 @@ class Card extends Phaser.GameObjects.Container {
     }
 
     getNumericValue() {
-        switch(this.value) {
-            case 'ace': return 1;
-            case 'jack': return 11;
-            case 'queen': return 12;
-            case 'king': return 13;
-            default: return parseInt(this.value);
+        switch (this.value) {
+            case 'ace':
+                return 1;
+            case 'jack':
+                return 11;
+            case 'queen':
+                return 12;
+            case 'king':
+                return 13;
+            default:
+                return parseInt(this.value);
         }
     }
 
@@ -135,6 +144,6 @@ class Card extends Phaser.GameObjects.Container {
         } else {
             this.enableDragging();
         }
-        console.log(`Card ${this.suit} ${this.value} set in deck: ${isInDeck}`);  // Debug log
+        //console.log(`Card ${this.suit} ${this.value} set in deck: ${isInDeck}`);  // Debug log
     }
 }

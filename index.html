@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
     <script src="card.js"></script>
     <script src="deck.js"></script>
+    <script src="clock.js"></script>
     <style>
         body {
             margin: 0;
@@ -17,6 +18,7 @@
             height: 100vh;
             background: #333;
         }
+
         #game {
             /* Container to maintain aspect ratio */
             max-width: 100vmin;
@@ -25,11 +27,11 @@
     </style>
 </head>
 <body>
-    <div id="game"></div>
-    <script>
+<div id="game"></div>
+<script>
     class ClockSolitaire extends Phaser.Scene {
         constructor() {
-            super({ key: 'ClockSolitaire' });
+            super({key: 'ClockSolitaire'});
         }
 
         preload() {
@@ -114,6 +116,12 @@
                 this.cameras.main.centerY
             );
 
+            // Create and visualize clock layout
+            this.clock = new Clock(this, this.cameras.main.centerX, this.cameras.main.centerY);
+            this.clock.debugDrawPositions();
+            //this.clock.testCheckWinCondition();
+            this.clock.dealInitialCards();
+
             // Add some test controls with keyboard
             this.input.keyboard.on('keydown-SPACE', () => {
                 // Deal a single card and flip it
@@ -151,21 +159,21 @@
             });
 
             // Add text instructions
-            this.add.text(10, 120, 'Controls:\nSPACE - Deal one card\nR - Reset deck\nD - Deal four cards', {
-                font: '16px Arial',
-                fill: '#ffffff'
-            });
+            //this.add.text(10, 120, 'Controls:\nSPACE - Deal one card\nR - Reset deck\nD - Deal four cards', {
+            //    font: '16px Arial',
+            //    fill: '#ffffff'
+            //});
 
             // Add remaining cards counter
-            this.cardsText = this.add.text(10, 80, '', {
-                font: '16px Arial',
-                fill: '#ffffff'
-            });
+            //this.cardsText = this.add.text(10, 80, '', {
+            //    font: '16px Arial',
+            //    fill: '#ffffff'
+            //});
 
             // Update counter every frame
-            this.events.on('update', () => {
-                this.cardsText.setText(`Cards remaining: ${this.deck.getCardsRemaining()}`);
-            });
+            //this.events.on('update', () => {
+            //    this.cardsText.setText(`Cards remaining: ${this.deck.getCardsRemaining()}`);
+            //});
         }
     }
 
@@ -190,7 +198,7 @@
             default: 'arcade',
             arcade: {
                 debug: false,
-                gravity: { y: 0 } // No gravity needed for cards
+                gravity: {y: 0} // No gravity needed for cards
             }
         }
     };
@@ -202,6 +210,6 @@
         const newSize = getGameSize();
         game.scale.resize(newSize.width, newSize.height);
     });
-    </script>
+</script>
 </body>
 </html>

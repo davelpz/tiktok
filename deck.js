@@ -34,7 +34,7 @@ class Deck {
             font: '16px Arial',
             fill: '#ffffff'
         });
-        this.updateDebugText();
+        //this.updateDebugText();
     }
 
     updateDebugText() {
