@@ -83,8 +83,18 @@ class Deck {
         const cards = this.dealCards(4);
         cards.forEach((card, index) => {
             if (card) {
-                card.setPosition(x, y + (index * 2));
-                card.setHomePosition(x, y + (index * 2));
+                // Animate each card
+                this.scene.tweens.add({
+                    targets: card,
+                    x: x,
+                    y: y + (index * 0.5),  // Smaller vertical offset
+                    duration: 200,
+                    ease: 'Power1',
+                    onComplete: () => {
+                        card.setHomePosition(x, y + (index * 0.5));
+                        card.flip();  // Flip after animation completes
+                    }
+                });
             }
         });
         return cards;

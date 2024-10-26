@@ -143,9 +143,10 @@
 
             // D key to deal 4 cards to a test position
             this.input.keyboard.on('keydown-D', () => {
+                // Use the same position as single card dealing
                 this.deck.dealToPosition(
                     this.cameras.main.centerX + 200,
-                    this.cameras.main.centerY - 100
+                    this.cameras.main.centerY
                 );
             });
 
