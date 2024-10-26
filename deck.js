@@ -1,5 +1,5 @@
 class Deck {
-    constructor(scene, x, y) {
+   constructor(scene, x, y) {
         this.scene = scene;
         this.deckX = x;
         this.deckY = y;
@@ -9,25 +9,28 @@ class Deck {
         const suits = ['clubs', 'diamonds', 'hearts', 'spades'];
         const values = ['ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king'];
 
-        // Create a hit zone for the deck
-        this.hitZone = scene.add.rectangle(x, y, 140, 190, 0x00ff00, 0);
-        this.hitZone.setInteractive();
-        this.hitZone.on('pointerdown', () => {
-            this.handleCardClick();
-        });
-
         suits.forEach(suit => {
             values.forEach(value => {
                 const card = new Card(scene, x, y, suit, value);
                 card.setInDeck(true);
+
+                // Add click handler
+                card.on('pointerdown', () => {
+                    console.log(`Card clicked: ${suit} ${value}`);  // Debug log
+                    if (this.isTopCard(card)) {
+                        console.log('Top card clicked!');  // Debug log
+                        this.handleCardClick();
+                    }
+                });
+
                 this.cards.push(card);
             });
         });
 
         this.shuffle();
 
-        // Debug text for development
-        this.debugText = scene.add.text(10, 50, '', {
+        // Add debug text
+        this.debugText = scene.add.text(10, 10, '', {
             font: '16px Arial',
             fill: '#ffffff'
         });
@@ -35,7 +38,11 @@ class Deck {
     }
 
     updateDebugText() {
-        this.debugText.setText(`Cards in deck: ${this.cards.length}\nDealt cards: ${this.dealtCards.length}`);
+        this.debugText.setText(
+            `Deck: ${this.cards.length} cards\n` +
+            `Dealt: ${this.dealtCards.length} cards\n` +
+            `Total: ${this.cards.length + this.dealtCards.length} cards`
+        );
     }
 
     shuffle() {
@@ -51,30 +58,6 @@ class Deck {
             // Bring later cards to top of the display list
             this.scene.children.bringToTop(card);
         });
-    }
-
-    handleCardClick() {
-        console.log('Deck clicked!'); // Debug log
-        const card = this.dealCard();
-        if (card) {
-            const targetX = this.deckX + 200;
-            const targetY = this.deckY;
-
-            // Animate the card being dealt
-            this.scene.tweens.add({
-                targets: card,
-                x: targetX,
-                y: targetY,
-                duration: 200,
-                ease: 'Power1',
-                onComplete: () => {
-                    card.flip();
-                    card.setHomePosition(targetX, targetY);
-                }
-            });
-
-            this.updateDebugText();
-        }
     }
 
     dealCard() {
@@ -140,5 +123,33 @@ class Deck {
         [...this.cards, ...this.dealtCards].forEach(card => {
             card.setCardBack(backStyle);
         });
+    }
+
+    isTopCard(card) {
+        return this.cards.length > 0 && this.cards[this.cards.length - 1] === card;
+    }
+
+    handleCardClick() {
+        console.log('Handling card click'); // Debug log
+        const card = this.dealCard();
+        if (card) {
+            const targetX = this.scene.cameras.main.centerX + 200;  // Match the space bar position
+            const targetY = this.scene.cameras.main.centerY;        // Match the space bar position
+
+            // Animate the card being dealt
+            this.scene.tweens.add({
+                targets: card,
+                x: targetX,
+                y: targetY,
+                duration: 200,
+                ease: 'Power1',
+                onComplete: () => {
+                    card.flip();
+                    card.setHomePosition(targetX, targetY);
+                }
+            });
+
+            this.updateDebugText();
+        }
     }
 }

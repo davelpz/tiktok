@@ -119,11 +119,20 @@
                 // Deal a single card and flip it
                 const card = this.deck.dealCard();
                 if (card) {
-                    card.setPosition(
-                        this.cameras.main.centerX + 200,  // dealt to the right of deck
-                        this.cameras.main.centerY
-                    );
-                    card.flip();
+                    const targetX = this.cameras.main.centerX + 200;
+                    const targetY = this.cameras.main.centerY;
+
+                    this.tweens.add({
+                        targets: card,
+                        x: targetX,
+                        y: targetY,
+                        duration: 200,
+                        ease: 'Power1',
+                        onComplete: () => {
+                            card.flip();
+                            card.setHomePosition(targetX, targetY);
+                        }
+                    });
                 }
             });
 
@@ -141,13 +150,13 @@
             });
 
             // Add text instructions
-            this.add.text(10, 10, 'Controls:\nSPACE - Deal one card\nR - Reset deck\nD - Deal four cards', {
+            this.add.text(10, 120, 'Controls:\nSPACE - Deal one card\nR - Reset deck\nD - Deal four cards', {
                 font: '16px Arial',
                 fill: '#ffffff'
             });
 
             // Add remaining cards counter
-            this.cardsText = this.add.text(10, 100, '', {
+            this.cardsText = this.add.text(10, 80, '', {
                 font: '16px Arial',
                 fill: '#ffffff'
             });

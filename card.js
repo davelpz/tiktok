@@ -5,7 +5,7 @@ class Card extends Phaser.GameObjects.Container {
         this.suit = suit;
         this.value = value;
         this.isFaceUp = false;
-        this.isInDeck = true;  // New property to track if card is in deck
+        this.isInDeck = true;
 
         // Create the card front and back sprites
         this.front = scene.add.image(0, 0, `card_${suit}_${value}`);
@@ -20,28 +20,38 @@ class Card extends Phaser.GameObjects.Container {
         // Add to scene's display list
         scene.add.existing(this);
 
-        // Enable input handling but start with draggable false
+        // Set up input handling
         this.setSize(this.front.width, this.front.height);
-        this.setInteractive();
+        this.setInteractive({ useHandCursor: true });  // Make it obvious card is clickable
+
+        // Debug bounds
+        this.debugBounds = scene.add.rectangle(0, 0, this.front.width, this.front.height, 0xff0000, 0.2);
+        this.debugBounds.setVisible(false);  // Set to true to see clickable areas
+        this.add(this.debugBounds);
 
         // Track original position for drag cancellation
         this.originalX = x;
         this.originalY = y;
+
+        console.log(`Created card: ${suit} ${value}`);  // Debug log
     }
 
     enableDragging() {
-        this.setInteractive({ draggable: true });
+        this.setInteractive({ draggable: true, useHandCursor: true });
         this.setupDragEvents();
+        console.log(`Dragging enabled for card: ${this.suit} ${this.value}`);  // Debug log
     }
 
     disableDragging() {
         this.disableInteractive();
-        this.setInteractive(); // Keep it clickable but not draggable
+        this.setInteractive({ useHandCursor: true });  // Keep it clickable but not draggable
+        console.log(`Dragging disabled for card: ${this.suit} ${this.value}`);  // Debug log
     }
 
     setupDragEvents() {
         this.on('dragstart', () => {
             this.scene.children.bringToTop(this);
+            console.log(`Started dragging: ${this.suit} ${this.value}`);  // Debug log
         });
 
         this.on('drag', (pointer, dragX, dragY) => {
@@ -51,6 +61,7 @@ class Card extends Phaser.GameObjects.Container {
 
         this.on('dragend', () => {
             this.returnToOriginalPosition();
+            console.log(`Ended dragging: ${this.suit} ${this.value}`);  // Debug log
         });
     }
 
@@ -75,6 +86,7 @@ class Card extends Phaser.GameObjects.Container {
                 });
             }
         });
+        console.log(`Flipped card: ${this.suit} ${this.value}`);  // Debug log
     }
 
     returnToOriginalPosition() {
@@ -112,6 +124,8 @@ class Card extends Phaser.GameObjects.Container {
     setHomePosition(x, y) {
         this.originalX = x;
         this.originalY = y;
+        this.x = x;
+        this.y = y;
     }
 
     setInDeck(isInDeck) {
@@ -121,5 +135,6 @@ class Card extends Phaser.GameObjects.Container {
         } else {
             this.enableDragging();
         }
+        console.log(`Card ${this.suit} ${this.value} set in deck: ${isInDeck}`);  // Debug log
     }
 }
