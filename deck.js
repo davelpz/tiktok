@@ -4,6 +4,7 @@ class Deck {
         this.deckX = x;
         this.deckY = y;
         this.cards = [];
+        this.dealtCards = []; // Track cards that have been dealt
 
         // Create all 52 cards
         const suits = ['clubs', 'diamonds', 'hearts', 'spades'];
@@ -33,7 +34,9 @@ class Deck {
 
     dealCard() {
         if (this.cards.length > 0) {
-            return this.cards.pop();
+            const card = this.cards.pop();
+            this.dealtCards.push(card);
+            return card;
         }
         return null;
     }
@@ -46,7 +49,6 @@ class Deck {
         return dealtCards;
     }
 
-    // Deal four cards to a specific position
     dealToPosition(x, y) {
         const cards = this.dealCards(4);
         cards.forEach((card, index) => {
@@ -65,19 +67,33 @@ class Deck {
 
     // Reset all cards back to deck
     resetDeck() {
-        this.cards.forEach(card => {
-            card.setPosition(this.deckX, this.deckY);
-            card.setHomePosition(this.deckX, this.deckY);
-            if (card.isFaceUp) {
-                card.flip();
-            }
+        // Combine dealt cards back into deck
+        while (this.dealtCards.length > 0) {
+            const card = this.dealtCards.pop();
+            // Animate card back to deck position
+            this.scene.tweens.add({
+                targets: card,
+                x: this.deckX,
+                y: this.deckY,
+                duration: 300,
+                ease: 'Back.easeOut',
+                onComplete: () => {
+                    if (card.isFaceUp) {
+                        card.flip();
+                    }
+                }
+            });
+            this.cards.push(card);
+        }
+
+        // Wait a bit then shuffle
+        this.scene.time.delayedCall(400, () => {
+            this.shuffle();
         });
-        this.shuffle();
     }
 
-    // Change card backs for all cards in deck
     setCardBacks(backStyle) {
-        this.cards.forEach(card => {
+        [...this.cards, ...this.dealtCards].forEach(card => {
             card.setCardBack(backStyle);
         });
     }
