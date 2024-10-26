@@ -5,10 +5,11 @@ class Card extends Phaser.GameObjects.Container {
         this.suit = suit;
         this.value = value;
         this.isFaceUp = false;
+        this.isInDeck = true;  // New property to track if card is in deck
 
         // Create the card front and back sprites
         this.front = scene.add.image(0, 0, `card_${suit}_${value}`);
-        this.back = scene.add.image(0, 0, 'cardback_blue'); // Default back
+        this.back = scene.add.image(0, 0, 'cardback_blue');
 
         // Add sprites to container
         this.add([this.back, this.front]);
@@ -19,16 +20,23 @@ class Card extends Phaser.GameObjects.Container {
         // Add to scene's display list
         scene.add.existing(this);
 
-        // Enable input handling
+        // Enable input handling but start with draggable false
         this.setSize(this.front.width, this.front.height);
-        this.setInteractive({ draggable: true });
-
-        // Setup drag events
-        this.setupDragEvents();
+        this.setInteractive();
 
         // Track original position for drag cancellation
         this.originalX = x;
         this.originalY = y;
+    }
+
+    enableDragging() {
+        this.setInteractive({ draggable: true });
+        this.setupDragEvents();
+    }
+
+    disableDragging() {
+        this.disableInteractive();
+        this.setInteractive(); // Keep it clickable but not draggable
     }
 
     setupDragEvents() {
@@ -42,14 +50,13 @@ class Card extends Phaser.GameObjects.Container {
         });
 
         this.on('dragend', () => {
-            // To be implemented: Check if card is over valid drop zone
-            // If not, return to original position
             this.returnToOriginalPosition();
         });
     }
 
     flip() {
-        // Flip animation
+        if (this.scene.tweens.isTweening(this)) return;
+
         this.scene.tweens.add({
             targets: this,
             scaleX: 0,
@@ -84,7 +91,6 @@ class Card extends Phaser.GameObjects.Container {
         this.back.setTexture(`cardback_${backStyle}`);
     }
 
-    // Getters for card properties
     getValue() {
         return this.value;
     }
@@ -103,9 +109,17 @@ class Card extends Phaser.GameObjects.Container {
         }
     }
 
-    // Method to update card's "home" position
     setHomePosition(x, y) {
         this.originalX = x;
         this.originalY = y;
+    }
+
+    setInDeck(isInDeck) {
+        this.isInDeck = isInDeck;
+        if (isInDeck) {
+            this.disableDragging();
+        } else {
+            this.enableDragging();
+        }
     }
 }

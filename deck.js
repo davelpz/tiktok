@@ -4,15 +4,23 @@ class Deck {
         this.deckX = x;
         this.deckY = y;
         this.cards = [];
-        this.dealtCards = []; // Track cards that have been dealt
+        this.dealtCards = [];
 
-        // Create all 52 cards
         const suits = ['clubs', 'diamonds', 'hearts', 'spades'];
         const values = ['ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king'];
 
         suits.forEach(suit => {
             values.forEach(value => {
                 const card = new Card(scene, x, y, suit, value);
+                card.setInDeck(true);
+
+                // Add click handler for top card
+                card.on('pointerdown', () => {
+                    if (card.isInDeck && this.isTopCard(card)) {
+                        this.handleCardClick();
+                    }
+                });
+
                 this.cards.push(card);
             });
         });
@@ -30,11 +38,34 @@ class Deck {
             this.cards[i].setPosition(this.deckX, this.deckY);
             this.cards[j].setPosition(this.deckX, this.deckY);
         }
+
+        // After shuffling, update all cards' positions
+        this.cards.forEach((card, index) => {
+            card.setPosition(this.deckX, this.deckY);
+            card.setHomePosition(this.deckX, this.deckY);
+        });
+    }
+
+    isTopCard(card) {
+        return this.cards.length > 0 && this.cards[this.cards.length - 1] === card;
+    }
+
+    handleCardClick() {
+        const card = this.dealCard();
+        if (card) {
+            card.setPosition(
+                this.deckX + 150,  // Deal to the right of the deck
+                this.deckY
+            );
+            card.setHomePosition(this.deckX + 150, this.deckY);
+            card.flip();
+        }
     }
 
     dealCard() {
         if (this.cards.length > 0) {
             const card = this.cards.pop();
+            card.setInDeck(false);
             this.dealtCards.push(card);
             return card;
         }
@@ -65,12 +96,10 @@ class Deck {
         return this.cards.length;
     }
 
-    // Reset all cards back to deck
     resetDeck() {
-        // Combine dealt cards back into deck
         while (this.dealtCards.length > 0) {
             const card = this.dealtCards.pop();
-            // Animate card back to deck position
+            card.setInDeck(true);
             this.scene.tweens.add({
                 targets: card,
                 x: this.deckX,
@@ -86,7 +115,6 @@ class Deck {
             this.cards.push(card);
         }
 
-        // Wait a bit then shuffle
         this.scene.time.delayedCall(400, () => {
             this.shuffle();
         });
