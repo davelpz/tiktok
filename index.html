@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <title>Clock Solitaire</title>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
+    <script src="card.js"></script>
+    <script src="deck.js"></script>
     <style>
         body {
             margin: 0;
@@ -105,13 +107,55 @@
         }
 
         create() {
-            // Test that loading worked by displaying a card
-            const testCard = this.add.image(
-                this.cameras.main.centerX,
-                this.cameras.main.centerY,
-                'card_clubs_2'
+            // Create deck slightly off-center
+            this.deck = new Deck(
+                this,
+                this.cameras.main.centerX - 200,  // offset left from center
+                this.cameras.main.centerY
             );
-            testCard.setScale(1); // Cards are already at proper resolution
+
+            // Add some test controls with keyboard
+            this.input.keyboard.on('keydown-SPACE', () => {
+                // Deal a single card and flip it
+                const card = this.deck.dealCard();
+                if (card) {
+                    card.setPosition(
+                        this.cameras.main.centerX + 200,  // dealt to the right of deck
+                        this.cameras.main.centerY
+                    );
+                    card.flip();
+                }
+            });
+
+            // R key to reset deck
+            this.input.keyboard.on('keydown-R', () => {
+                this.deck.resetDeck();
+            });
+
+            // D key to deal 4 cards to a test position
+            this.input.keyboard.on('keydown-D', () => {
+                this.deck.dealToPosition(
+                    this.cameras.main.centerX + 200,
+                    this.cameras.main.centerY - 100
+                );
+            });
+
+            // Add text instructions
+            this.add.text(10, 10, 'Controls:\nSPACE - Deal one card\nR - Reset deck\nD - Deal four cards', {
+                font: '16px Arial',
+                fill: '#ffffff'
+            });
+
+            // Add remaining cards counter
+            this.cardsText = this.add.text(10, 100, '', {
+                font: '16px Arial',
+                fill: '#ffffff'
+            });
+
+            // Update counter every frame
+            this.events.on('update', () => {
+                this.cardsText.setText(`Cards remaining: ${this.deck.getCardsRemaining()}`);
+            });
         }
     }
 
