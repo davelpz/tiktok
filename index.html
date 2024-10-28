@@ -128,7 +128,32 @@
                     if (gameObject.input.draggable) {  // Ensure only draggable cards move
                         gameObject.x = dragX;
                         gameObject.y = dragY;
+                        //console.log('Card dragged:', gameObject);
+                    } else {
+                        console.log('Card is not draggable:', gameObject);
                     }
+                } else {
+                    console.log('Not a card:', gameObject);
+                }
+
+            });
+
+            this.input.on('dragend', (pointer, gameObject) => {
+                console.log('dragend', gameObject);
+                // Get the target drop zone for this card’s value
+                const positionIndex = gameObject.getNumericValue();
+                const targetPosition = this.clock.positions.get(positionIndex);
+
+                // Calculate distance to target position
+                const toleranceDistance = 30;  // Adjust based on desired snap radius
+                const distance = Phaser.Math.Distance.Between(gameObject.x, gameObject.y, targetPosition.x, targetPosition.y);
+
+                if (distance < toleranceDistance) {
+                    // Place card in correct position using `handleCardDrop`
+                    this.clock.handleCardDrop(gameObject, positionIndex);
+                } else {
+                    // Return to original position if drop is outside tolerance
+                    gameObject.returnToOriginalPosition();
                 }
             });
 

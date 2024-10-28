@@ -68,6 +68,7 @@ class Clock {
     }
 
     setupDropZones() {
+        console.log('Setting up drop zones');
         this.dropZones = new Map();
 
         // Create a drop zone for each position (1-13)
@@ -75,29 +76,13 @@ class Clock {
             const pos = this.positions.get(i);
 
             // Calculate scaled dimensions
-            const scaledWidth = 234 * this.cardScale;
-            const scaledHeight = 333 * this.cardScale;
+            const scaledWidth = 234 * this.cardScale * 1.1;
+            const scaledHeight = 333 * this.cardScale * 1.1;
 
             // Create drop zone rectangle with correct card dimensions
-            const zone = this.scene.add.rectangle(pos.x, pos.y, scaledWidth, scaledHeight, 0x99ff99, 0);
+            const zone = this.scene.add.rectangle(pos.x, pos.y, scaledWidth, scaledHeight, 0x00FF00, 1);
 
-            zone.setInteractive({dropZone: true});
-
-            // Add hover feedback
-            zone.on('dragenter', () => {
-                zone.setStrokeStyle(4, 0x00ff00);
-            });
-
-            zone.on('dragleave', () => {
-                zone.setStrokeStyle(0);
-            });
-
-            zone.on('drop', (pointer, card) => {
-                zone.setStrokeStyle(0);
-                console.log('Drop attempted at position:', i);
-                console.log('Card value:', card.getNumericValue());
-                this.handleCardDrop(card, i);  // We'll implement this method next
-            });
+            console.log('Drop zone set interactive for position:', i);
 
             this.dropZones.set(i, zone);
         }
