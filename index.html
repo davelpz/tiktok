@@ -118,44 +118,18 @@
 
             // Create and visualize clock layout
             this.clock = new Clock(this, this.cameras.main.centerX, this.cameras.main.centerY);
-            this.clock.debugDrawPositions();
+            //this.clock.debugDrawPositions();
             //this.clock.testCheckWinCondition();
             this.clock.dealInitialCards();
 
-            // Add some test controls with keyboard
-            this.input.keyboard.on('keydown-SPACE', () => {
-                // Deal a single card and flip it
-                const card = this.deck.dealCard();
-                if (card) {
-                    const targetX = this.cameras.main.centerX + 200;
-                    const targetY = this.cameras.main.centerY;
-
-                    this.tweens.add({
-                        targets: card,
-                        x: targetX,
-                        y: targetY,
-                        duration: 200,
-                        ease: 'Power1',
-                        onComplete: () => {
-                            card.flip();
-                            card.setHomePosition(targetX, targetY);
-                        }
-                    });
+            // In ClockSolitaire's create() method:
+            this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
+                if (gameObject instanceof Card) {
+                    if (gameObject.input.draggable) {  // Ensure only draggable cards move
+                        gameObject.x = dragX;
+                        gameObject.y = dragY;
+                    }
                 }
-            });
-
-            // R key to reset deck
-            this.input.keyboard.on('keydown-R', () => {
-                this.deck.resetDeck();
-            });
-
-            // D key to deal 4 cards to a test position
-            this.input.keyboard.on('keydown-D', () => {
-                // Use the same position as single card dealing
-                this.deck.dealToPosition(
-                    this.cameras.main.centerX + 200,
-                    this.cameras.main.centerY
-                );
             });
 
             // Add text instructions

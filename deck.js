@@ -13,16 +13,6 @@ class Deck {
             values.forEach(value => {
                 const card = new Card(scene, x, y, suit, value);
                 card.setInDeck(true);
-
-                // Add click handler
-                card.on('pointerdown', () => {
-                    console.log(`Card clicked: ${suit} ${value}`);  // Debug log
-                    if (this.isTopCard(card)) {
-                        console.log('Top card clicked!');  // Debug log
-                        this.handleCardClick();
-                    }
-                });
-
                 this.cards.push(card);
             });
         });
@@ -30,10 +20,10 @@ class Deck {
         this.shuffle();
 
         // Add debug text
-        this.debugText = scene.add.text(10, 10, '', {
-            font: '16px Arial',
-            fill: '#ffffff'
-        });
+        // this.debugText = scene.add.text(10, 10, '', {
+        //     font: '16px Arial',
+        //     fill: '#ffffff'
+        // });
         //this.updateDebugText();
     }
 

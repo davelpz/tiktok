@@ -38,29 +38,22 @@ class Card extends Phaser.GameObjects.Container {
     }
 
     enableDragging() {
-        // Clear any existing interactive state
-        this.disableInteractive();
-
-        // Set up dragging exactly like our working test
+        // Make this card draggable without re-adding the scene-level listener
         this.setInteractive({draggable: true});
         this.scene.input.setDraggable(this);
-
-        // Simple drag handler at the scene level
-        this.scene.input.on('drag', (pointer, gameObject, dragX, dragY) => {
-            if (gameObject === this) {
-                gameObject.x = dragX;
-                gameObject.y = dragY;
-            }
-        });
-
         console.log('Simple drag enabled for:', this.suit, this.value);
     }
 
     disableDragging() {
-        this.disableInteractive();
-        this.setInteractive({useHandCursor: true});  // Keep it clickable but not draggable
-        //console.log(`Dragging disabled for card: ${this.suit} ${this.value}`);  // Debug log
+        this.removeInteractive();  // Remove all interactive state
+        this.setInteractive({useHandCursor: true});  // Restore clickability without drag
+        if (this.input) {
+            this.input.draggable = false;  // Directly override draggable attribute
+        }
+        console.log(`Dragging disabled for card: ${this.suit} ${this.value}`);
+        console.log('input.draggable after removeInteractive:', this.input ? this.input.draggable : 'no input');
     }
+
 
     setupDragEvents() {
         this.on('dragstart', () => {
@@ -157,11 +150,6 @@ class Card extends Phaser.GameObjects.Container {
 
     setInDeck(isInDeck) {
         this.isInDeck = isInDeck;
-        if (isInDeck) {
-            this.disableDragging();
-        } else {
-            this.enableDragging();
-        }
         //console.log(`Card ${this.suit} ${this.value} set in deck: ${isInDeck}`);  // Debug log
     }
 }
