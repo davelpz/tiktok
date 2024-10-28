@@ -29,8 +29,8 @@ class Clock {
     }
 
     setupClockPositions() {
-        // Start at -90 degrees (12 o'clock position) and work clockwise
-        const startAngle = -90;
+        // start at the 1 o'clock position
+        const startAngle =  -60;
         const angleIncrement = 360 / 12;
 
         // Setup positions 1-12 around the clock (1=Ace through 12=Queen)
