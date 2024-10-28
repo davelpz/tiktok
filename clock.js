@@ -94,6 +94,8 @@ class Clock {
 
             zone.on('drop', (pointer, card) => {
                 zone.setStrokeStyle(0);
+                console.log('Drop attempted at position:', i);
+                console.log('Card value:', card.getNumericValue());
                 this.handleCardDrop(card, i);  // We'll implement this method next
             });
 
@@ -148,11 +150,14 @@ class Clock {
                 card.setScale(this.cardScale, this.cardScale);  // Apply calculated scale
                 card.setPosition(pos.x, pos.y + index * 0.5);
                 card.setHomePosition(pos.x, pos.y + index * 0.5);
+                card.disableDragging();  // Disable dragging by default
 
                 // Make the top card of position 13 (king) draggable
                 if (position === 13 && index === cards.length - 1) {
-                    card.setInteractive({draggable: true});
+                    card.enableDragging(); // Enable dragging for the top card
                     card.flip();  // Flip it face up so we can see what it is
+                    console.log('Made card draggable:', card.suit, card.value);
+                    console.log('Card interactive state:', card.input.draggable);  // Add this line
                 }
             });
 

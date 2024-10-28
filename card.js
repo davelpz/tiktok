@@ -22,6 +22,7 @@ class Card extends Phaser.GameObjects.Container {
 
         // Set up input handling
         this.setSize(this.front.width, this.front.height);
+        console.log('Setting up interactive area:', this.front.width, this.front.height);
         this.setInteractive({useHandCursor: true});  // Make it obvious card is clickable
 
         // Debug bounds
@@ -37,9 +38,22 @@ class Card extends Phaser.GameObjects.Container {
     }
 
     enableDragging() {
-        this.setInteractive({draggable: true, useHandCursor: true});
-        this.setupDragEvents();
-        //console.log(`Dragging enabled for card: ${this.suit} ${this.value}`);  // Debug log
+        // Clear any existing interactive state
+        this.disableInteractive();
+
+        // Set up dragging exactly like our working test
+        this.setInteractive({draggable: true});
+        this.scene.input.setDraggable(this);
+
+        // Simple drag handler at the scene level
+        this.scene.input.on('drag', (pointer, gameObject, dragX, dragY) => {
+            if (gameObject === this) {
+                gameObject.x = dragX;
+                gameObject.y = dragY;
+            }
+        });
+
+        console.log('Simple drag enabled for:', this.suit, this.value);
     }
 
     disableDragging() {
@@ -51,18 +65,22 @@ class Card extends Phaser.GameObjects.Container {
     setupDragEvents() {
         this.on('dragstart', () => {
             this.scene.children.bringToTop(this);
-            console.log(`Started dragging: ${this.suit} ${this.value}`);  // Debug log
+            console.log('DRAG START:', this.suit, this.value);
         });
 
         this.on('drag', (pointer, dragX, dragY) => {
+            console.log('DRAGGING to:', dragX, dragY);
             this.x = dragX;
             this.y = dragY;
         });
 
         this.on('dragend', () => {
-            this.returnToOriginalPosition();
-            console.log(`Ended dragging: ${this.suit} ${this.value}`);  // Debug log
+            console.log('DRAG END');
+            //this.returnToOriginalPosition();
         });
+
+        // Debug log to confirm events were set up
+        console.log('Drag events initialized for:', this.suit, this.value);
     }
 
     flip() {
