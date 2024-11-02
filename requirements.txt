@@ -1,3 +1,0 @@
-raylib~=5.0.0.1
-setuptools~=45.2.0
-CairoSVG~=2.7.1
