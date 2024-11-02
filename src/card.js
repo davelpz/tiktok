@@ -1,4 +1,4 @@
-class Card extends Phaser.GameObjects.Container {
+export default class Card extends Phaser.GameObjects.Container {
     constructor(scene, x, y, suit, value) {
         super(scene, x, y);
 

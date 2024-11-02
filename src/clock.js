@@ -1,4 +1,4 @@
-class Clock {
+export default class Clock {
     constructor(scene, x, y) {
         this.scene = scene;
         this.centerX = x;

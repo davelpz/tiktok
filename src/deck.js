@@ -1,4 +1,6 @@
-class Deck {
+import Card from './card.js';
+
+export default class Deck {
    constructor(scene, x, y) {
         this.scene = scene;
         this.deckX = x;
