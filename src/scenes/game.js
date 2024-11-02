@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import Deck from "../deck.js";
 import Clock from "../clock.js";
+import Card from "../card.js";
 
 export default class ClockSolitaire extends Phaser.Scene {
     constructor() {
@@ -91,44 +92,42 @@ export default class ClockSolitaire extends Phaser.Scene {
 
         // Create and visualize clock layout
         this.clock = new Clock(this, this.cameras.main.centerX, this.cameras.main.centerY);
-        this.clock.debugDrawPositions();
+        //this.clock.debugDrawPositions();
         //this.clock.testCheckWinCondition();
         this.clock.dealInitialCards();
 
-        // Add some test controls with keyboard
-        this.input.keyboard.on('keydown-SPACE', () => {
-            // Deal a single card and flip it
-            const card = this.deck.dealCard();
-            if (card) {
-                const targetX = this.cameras.main.centerX + 200;
-                const targetY = this.cameras.main.centerY;
-
-                this.tweens.add({
-                    targets: card,
-                    x: targetX,
-                    y: targetY,
-                    duration: 200,
-                    ease: 'Power1',
-                    onComplete: () => {
-                        card.flip();
-                        card.setHomePosition(targetX, targetY);
-                    }
-                });
+        this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
+            if (gameObject instanceof Card) {
+                if (gameObject.input.draggable) {  // Ensure only draggable cards move
+                    gameObject.x = dragX;
+                    gameObject.y = dragY;
+                    //console.log('Card dragged:', gameObject);
+                } else {
+                    console.log('Card is not draggable:', gameObject);
+                }
+            } else {
+                console.log('Not a card:', gameObject);
             }
+
         });
 
-        // R key to reset deck
-        this.input.keyboard.on('keydown-R', () => {
-            this.deck.resetDeck();
-        });
+        this.input.on('dragend', (pointer, gameObject) => {
+            console.log('dragend', gameObject);
+            // Get the target drop zone for this card’s value
+            const positionIndex = gameObject.getNumericValue();
+            const targetPosition = this.clock.positions.get(positionIndex);
 
-        // D key to deal 4 cards to a test position
-        this.input.keyboard.on('keydown-D', () => {
-            // Use the same position as single card dealing
-            this.deck.dealToPosition(
-                this.cameras.main.centerX + 200,
-                this.cameras.main.centerY
-            );
+            // Calculate distance to target position
+            const toleranceDistance = 30;  // Adjust based on desired snap radius
+            const distance = Phaser.Math.Distance.Between(gameObject.x, gameObject.y, targetPosition.x, targetPosition.y);
+
+            if (distance < toleranceDistance) {
+                // Place card in correct position using `handleCardDrop`
+                this.clock.handleCardDrop(gameObject, positionIndex);
+            } else {
+                // Return to original position if drop is outside tolerance
+                gameObject.returnToOriginalPosition();
+            }
         });
 
         // Add text instructions
