@@ -68,7 +68,7 @@ export default class Clock {
     }
 
     setupDropZones() {
-        console.log('Setting up drop zones');
+        //console.log('Setting up drop zones');
         this.dropZones = new Map();
 
         // Create a drop zone for each position (1-13)
@@ -82,7 +82,7 @@ export default class Clock {
             // Create drop zone rectangle with correct card dimensions
             const zone = this.scene.add.rectangle(pos.x, pos.y, scaledWidth, scaledHeight, 0x00FF00, 1);
 
-            console.log('Drop zone set interactive for position:', i);
+            //console.log('Drop zone set interactive for position:', i);
 
             this.dropZones.set(i, zone);
         }
@@ -137,7 +137,7 @@ export default class Clock {
                 const previousStack = this.cardStacks.get(card.currentPosition);
                 const cardIndex = previousStack.indexOf(card);
                 if (cardIndex > -1) {
-                    console.log('Removing card from previous stack:', card.currentPosition);
+                    //console.log('Removing card from previous stack:', card.currentPosition);
                     previousStack.splice(cardIndex, 1);
                 }
             }

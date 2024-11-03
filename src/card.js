@@ -41,7 +41,7 @@ export default class Card extends Phaser.GameObjects.Container {
         // Make this card draggable without re-adding the scene-level listener
         this.setInteractive({draggable: true});
         this.scene.input.setDraggable(this);
-        console.log('Simple drag enabled for:', this.suit, this.value);
+        //console.log('Simple drag enabled for:', this.suit, this.value);
     }
 
     disableDragging() {
@@ -50,7 +50,7 @@ export default class Card extends Phaser.GameObjects.Container {
         if (this.input) {
             this.input.draggable = false;  // Directly override draggable attribute
         }
-        console.log(`Dragging disabled for card: ${this.suit} ${this.value}`);
+        //console.log(`Dragging disabled for card: ${this.suit} ${this.value}`);
         //console.log('input.draggable after removeInteractive:', this.input ? this.input.draggable : 'no input');
     }
 
@@ -97,7 +97,7 @@ export default class Card extends Phaser.GameObjects.Container {
                 });
             }
         });
-        console.log(`Flipped card: ${this.suit} ${this.value}`);  // Debug log
+        console.log(`Flipped card: ${this.value} of ${this.suit}`);  // Debug log
     }
 
     returnToOriginalPosition() {
