@@ -120,71 +120,24 @@ export default class Clock {
     }
 
     handleCardDrop(card, positionIndex) {
-        // Convert card value to numeric (position) value
-        const cardValue = card.getNumericValue();
-
         // Validate card placement
-        if (cardValue === positionIndex) {
-            console.log('Card placed in correct position:', cardValue);
-            // Get position coordinates
+        if (this.isCardInCorrectPosition(card, positionIndex)) {
+            console.log('Card placed in correct position:', card.getNumericValue());
+            // Get current stack and position
             const pos = this.positions.get(positionIndex);
-
-            // Get current stack at this position
             const stack = this.cardStacks.get(positionIndex);
 
-            // Remove card from its previous stack if it has a previous position
-            if (card.currentPosition !== undefined) {
-                const previousStack = this.cardStacks.get(card.currentPosition);
-                const cardIndex = previousStack.indexOf(card);
-                if (cardIndex > -1) {
-                    //console.log('Removing card from previous stack:', card.currentPosition);
-                    previousStack.splice(cardIndex, 1);
-                }
-            }
-
-            // Add the card to the bottom of the stack
-            stack.unshift(card);
-
-            // Position the new card at the bottom with a slight offset
-            card.setPosition(pos.x, pos.y + (stack.length - 1) * 0.5);
-            card.setHomePosition(pos.x, pos.y + (stack.length - 1) * 0.5);
-            card.disableDragging();  // Make it non-draggable once placed
-
+            // Remove from previous stack
+            this.removeFromPreviousStack(card);
+            // Add card to the bottom of the stack
+            this.addCardToStackBottom(card, stack, pos);
             // Update currentPosition to the new stack's position
             card.currentPosition = positionIndex;
+            // Update stack depths to keep them ordered visually
+            this.updateStackDepths(stack);
 
-            // Set depth for all cards in the stack to keep them ordered visually
-            stack.forEach((stackCard, index) => {
-                stackCard.setDepth(index);  // Lower index is visually lower
-            });
-
-            // Flip and enable dragging for the top card in the stack
-            let topCard = stack[stack.length - 1];
-            let iterations = 0;  // Limit the loop to the number of cards in the stack
-            while (topCard.getNumericValue() === positionIndex && iterations < stack.length) {
-                console.log('\nTop card is in correct position:', topCard.getNumericValue());
-                console.log("iterations:", iterations, "stack length:", stack.length);
-                if (!topCard.isFaceUp) {
-                    topCard.flip();
-                }
-
-                // Move the correct card to the bottom
-                stack.unshift(stack.pop());
-                stack.forEach((stackCard, index) => {
-                    stackCard.setPosition(pos.x, pos.y + index * 0.5);
-                    stackCard.setHomePosition(pos.x, pos.y + index * 0.5);
-                    stackCard.setDepth(index);
-                });
-
-                // Update top card after moving
-                topCard = stack[stack.length - 1];
-                iterations++;  // Increment the loop counter to prevent infinite loops
-            }
-
-            if (!topCard.isFaceUp) {
-                topCard.flip();
-            }
-            topCard.enableDragging();
+            // Cycle correct cards to the bottom and enable dragging for the top card
+            this.cycleCorrectCardsToBottom(stack, positionIndex, pos);
 
             // Emit card placed event
             this.events.emit('cardPlaced', {card, position: positionIndex, stackSize: stack.length});
@@ -192,7 +145,7 @@ export default class Clock {
             // Check win condition
             this.checkWinCondition();
         } else {
-            console.log('Invalid placement for card:', cardValue, 'at position:', positionIndex);
+            console.log('Invalid placement for card:', card.getNumericValue(), 'at position:', positionIndex);
             // Invalid placement - return card to original position
             card.returnToOriginalPosition();
 
@@ -201,9 +154,63 @@ export default class Clock {
         }
     }
 
+    isCardInCorrectPosition(card, positionIndex) {
+        return card.getNumericValue() === positionIndex;
+    }
+
+    removeFromPreviousStack(card) {
+        if (card.currentPosition !== undefined) {
+            const previousStack = this.cardStacks.get(card.currentPosition);
+            const cardIndex = previousStack.indexOf(card);
+            if (cardIndex > -1) {
+                previousStack.splice(cardIndex, 1);
+            }
+        }
+    }
+
+    addCardToStackBottom(card, stack, pos) {
+        stack.unshift(card);
+        this.setCardStackPosition(card, pos, (stack.length - 1));
+        card.disableDragging();
+    }
+
+    updateStackDepths(stack) {
+        stack.forEach((stackCard, index) => {
+            stackCard.setDepth(index);
+        });
+    }
+
+    cycleCorrectCardsToBottom(stack, positionIndex, pos) {
+        let topCard = stack[stack.length - 1];
+        let iterations = 0;
+
+        while (topCard.getNumericValue() === positionIndex && iterations < stack.length) {
+            if (!topCard.isFaceUp) {
+                topCard.flip();
+            }
+            stack.unshift(stack.pop());
+            stack.forEach((stackCard, index) => {
+                this.setCardStackPosition(stackCard, pos, index);
+                stackCard.setDepth(index);
+            });
+            topCard = stack[stack.length - 1];
+            iterations++;
+        }
+
+        if (!topCard.isFaceUp) {
+            topCard.flip();
+        }
+        topCard.enableDragging();
+    }
+
+    setCardStackPosition(card, pos, index) {
+        const yOffset = pos.y + index;// * 0.5;
+        card.setPosition(pos.x, yOffset);
+        card.setHomePosition(pos.x, yOffset);
+    }
+
     checkWinCondition() {
         // Check if king position is complete (all cards revealed)
-        const kingStack = this.cardStacks.get(13);
         if (this.isKingPositionComplete()) {
             // King stack is complete, now check if all other positions are complete
             const allPositionsComplete = this.areAllPositionsComplete();
