@@ -208,8 +208,8 @@ export default class Clock {
     }
 
     setCardStackPosition(card, pos, index) {
-        const yOffset = pos.y + index * 1.5;
-        const xOffset = pos.x + index * 1.5;
+        const yOffset = pos.y + index * 2;
+        const xOffset = pos.x + index * 2;
         card.setPosition(xOffset, yOffset);
         card.setHomePosition(xOffset, yOffset);
     }
