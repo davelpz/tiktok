@@ -163,6 +163,7 @@ export default class Clock {
             let iterations = 0;  // Limit the loop to the number of cards in the stack
             while (topCard.getNumericValue() === positionIndex && iterations < stack.length) {
                 console.log('\nTop card is in correct position:', topCard.getNumericValue());
+                console.log("iterations:", iterations, "stack length:", stack.length);
                 if (!topCard.isFaceUp) {
                     topCard.flip();
                 }
@@ -223,6 +224,7 @@ export default class Clock {
 
     isKingPositionComplete() {
         const kingStack = this.cardStacks.get(13);
+        console.log('Checking king stack:', kingStack);
         return kingStack.length === 4 && kingStack.every(card =>
             card.isFaceUp && card.getNumericValue() === 13
         );
