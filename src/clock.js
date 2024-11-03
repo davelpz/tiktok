@@ -57,10 +57,10 @@ export default class Clock {
             const pos = this.positions.get(i);
 
             // Draw circle
-            const circle = this.scene.add.circle(pos.x, pos.y, 30, 0x00ff00, 0.3);
+            this.scene.add.circle(pos.x, pos.y, 30, 0x00ff00, 0.3);
 
             // Add position number
-            const text = this.scene.add.text(pos.x - 5, pos.y - 5, i.toString(), {
+            this.scene.add.text(pos.x - 5, pos.y - 5, i.toString(), {
                 font: '16px Arial',
                 fill: '#ffffff'
             });
@@ -97,11 +97,11 @@ export default class Clock {
             const cards = deck.dealCards(4);
             const pos = this.positions.get(position);
 
+            this.fixCardStackPositions(cards, pos);
+
             // Place cards at position with slight offset
             cards.forEach((card, index) => {
                 card.setScale(this.cardScale, this.cardScale);  // Apply calculated scale
-                card.setPosition(pos.x, pos.y + index * 0.5);
-                card.setHomePosition(pos.x, pos.y + index * 0.5);
                 card.disableDragging();  // Disable dragging by default
                 card.currentPosition = position;  // Track current position
 
@@ -170,7 +170,7 @@ export default class Clock {
 
     addCardToStackBottom(card, stack, pos) {
         stack.unshift(card);
-        this.setCardStackPosition(card, pos, (stack.length - 1));
+        this.fixCardStackPositions(stack, pos);
         card.disableDragging();
     }
 
@@ -189,10 +189,8 @@ export default class Clock {
                 topCard.flip();
             }
             stack.unshift(stack.pop());
-            stack.forEach((stackCard, index) => {
-                this.setCardStackPosition(stackCard, pos, index);
-                stackCard.setDepth(index);
-            });
+            this.fixCardStackPositions(stack, pos);
+            this.updateStackDepths(stack);
             topCard = stack[stack.length - 1];
             iterations++;
         }
@@ -203,10 +201,17 @@ export default class Clock {
         topCard.enableDragging();
     }
 
+    fixCardStackPositions(stack, pos) {
+        stack.forEach((stackCard, index) => {
+            this.setCardStackPosition(stackCard, pos, index);
+        });
+    }
+
     setCardStackPosition(card, pos, index) {
-        const yOffset = pos.y + index;// * 0.5;
-        card.setPosition(pos.x, yOffset);
-        card.setHomePosition(pos.x, yOffset);
+        const yOffset = pos.y + index * 1.5;
+        const xOffset = pos.x + index * 1.5;
+        card.setPosition(xOffset, yOffset);
+        card.setHomePosition(xOffset, yOffset);
     }
 
     checkWinCondition() {
