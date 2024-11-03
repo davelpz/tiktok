@@ -6,6 +6,7 @@ export default class Card extends Phaser.GameObjects.Container {
         this.value = value;
         this.isFaceUp = false;
         this.isInDeck = true;
+        this.currentPosition = undefined;
 
         // Create the card front and back sprites
         this.front = scene.add.image(0, 0, `card_${suit}_${value}`);
@@ -50,7 +51,7 @@ export default class Card extends Phaser.GameObjects.Container {
             this.input.draggable = false;  // Directly override draggable attribute
         }
         console.log(`Dragging disabled for card: ${this.suit} ${this.value}`);
-        console.log('input.draggable after removeInteractive:', this.input ? this.input.draggable : 'no input');
+        //console.log('input.draggable after removeInteractive:', this.input ? this.input.draggable : 'no input');
     }
 
     setupDragEvents() {

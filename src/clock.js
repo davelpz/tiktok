@@ -88,39 +88,6 @@ export default class Clock {
         }
     }
 
-    handleCardDrop(card, positionIndex) {
-        // Convert card value to numeric (position) value
-        const cardValue = card.getNumericValue();
-
-        // Validate card placement
-        if (cardValue === positionIndex) {
-            // Get position coordinates
-            const pos = this.positions.get(positionIndex);
-
-            // Get current stack at this position
-            const stack = this.cardStacks.get(positionIndex);
-
-            // Add card to stack
-            stack.push(card);
-
-            // Position card in stack (slight offset for each card)
-            card.setPosition(pos.x, pos.y + stack.length * 0.5);
-            card.setHomePosition(pos.x, pos.y + stack.length * 0.5);
-
-            // Emit card placed event
-            this.events.emit('cardPlaced', {card, position: positionIndex, stackSize: stack.length});
-
-            // Check win condition
-            this.checkWinCondition();
-        } else {
-            // Invalid placement - return card to original position
-            card.returnToOriginalPosition();
-
-            // Emit invalid placement event
-            this.events.emit('invalidPlacement', {card, attemptedPosition: positionIndex});
-        }
-    }
-
     dealInitialCards() {
         // Need to get the deck from the scene
         const deck = this.scene.deck;
@@ -136,18 +103,100 @@ export default class Clock {
                 card.setPosition(pos.x, pos.y + index * 0.5);
                 card.setHomePosition(pos.x, pos.y + index * 0.5);
                 card.disableDragging();  // Disable dragging by default
+                card.currentPosition = position;  // Track current position
 
                 // Make the top card of position 13 (king) draggable
                 if (position === 13 && index === cards.length - 1) {
                     card.enableDragging(); // Enable dragging for the top card
                     card.flip();  // Flip it face up so we can see what it is
-                    console.log('Made card draggable:', card.suit, card.value);
-                    console.log('Card interactive state:', card.input.draggable);  // Add this line
+                    //console.log('Made card draggable:', card.suit, card.value);
+                    //console.log('Card interactive state:', card.input.draggable);  // Add this line
                 }
             });
 
             // Store cards in our stacks
             this.cardStacks.set(position, cards);
+        }
+    }
+
+    handleCardDrop(card, positionIndex) {
+        // Convert card value to numeric (position) value
+        const cardValue = card.getNumericValue();
+
+        // Validate card placement
+        if (cardValue === positionIndex) {
+            console.log('Card placed in correct position:', cardValue);
+            // Get position coordinates
+            const pos = this.positions.get(positionIndex);
+
+            // Get current stack at this position
+            const stack = this.cardStacks.get(positionIndex);
+
+            // Remove card from its previous stack if it has a previous position
+            if (card.currentPosition !== undefined) {
+                const previousStack = this.cardStacks.get(card.currentPosition);
+                const cardIndex = previousStack.indexOf(card);
+                if (cardIndex > -1) {
+                    console.log('Removing card from previous stack:', card.currentPosition);
+                    previousStack.splice(cardIndex, 1);
+                }
+            }
+
+            // Add the card to the bottom of the stack
+            stack.unshift(card);
+
+            // Position the new card at the bottom with a slight offset
+            card.setPosition(pos.x, pos.y + (stack.length - 1) * 0.5);
+            card.setHomePosition(pos.x, pos.y + (stack.length - 1) * 0.5);
+            card.disableDragging();  // Make it non-draggable once placed
+
+            // Update currentPosition to the new stack's position
+            card.currentPosition = positionIndex;
+
+            // Set depth for all cards in the stack to keep them ordered visually
+            stack.forEach((stackCard, index) => {
+                stackCard.setDepth(index);  // Lower index is visually lower
+            });
+
+            // Flip and enable dragging for the top card in the stack
+            let topCard = stack[stack.length - 1];
+            let iterations = 0;  // Limit the loop to the number of cards in the stack
+            while (topCard.getNumericValue() === positionIndex && iterations < stack.length) {
+                console.log('\nTop card is in correct position:', topCard.getNumericValue());
+                if (!topCard.isFaceUp) {
+                    topCard.flip();
+                }
+
+                // Move the correct card to the bottom
+                stack.unshift(stack.pop());
+                stack.forEach((stackCard, index) => {
+                    stackCard.setPosition(pos.x, pos.y + index * 0.5);
+                    stackCard.setHomePosition(pos.x, pos.y + index * 0.5);
+                    stackCard.setDepth(index);
+                });
+
+                // Update top card after moving
+                topCard = stack[stack.length - 1];
+                iterations++;  // Increment the loop counter to prevent infinite loops
+            }
+
+            if (!topCard.isFaceUp) {
+                topCard.flip();
+            }
+            topCard.enableDragging();
+
+            // Emit card placed event
+            this.events.emit('cardPlaced', {card, position: positionIndex, stackSize: stack.length});
+
+            // Check win condition
+            this.checkWinCondition();
+        } else {
+            console.log('Invalid placement for card:', cardValue, 'at position:', positionIndex);
+            // Invalid placement - return card to original position
+            card.returnToOriginalPosition();
+
+            // Emit invalid placement event
+            this.events.emit('invalidPlacement', {card, attemptedPosition: positionIndex});
         }
     }
 
@@ -159,8 +208,10 @@ export default class Clock {
             const allPositionsComplete = this.areAllPositionsComplete();
 
             if (allPositionsComplete) {
+                console.log('Game won!');
                 this.events.emit('gameWon');
             } else {
+                console.log('Game lost!');
                 this.events.emit('gameLost');
             }
 
@@ -172,7 +223,7 @@ export default class Clock {
 
     isKingPositionComplete() {
         const kingStack = this.cardStacks.get(13);
-        return kingStack.every(card =>
+        return kingStack.length === 4 && kingStack.every(card =>
             card.isFaceUp && card.getNumericValue() === 13
         );
     }
