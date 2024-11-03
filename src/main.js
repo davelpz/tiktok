@@ -1,5 +1,9 @@
 import Phaser from "phaser";
-import ClockSolitaire from "./scenes/game.js";
+import { Boot } from './scenes/Boot';
+import { Game } from './scenes/Game';
+import { GameOver } from './scenes/GameOver';
+import { MainMenu } from './scenes/MainMenu';
+import { Preloader } from './scenes/Preloader';
 
 // Calculate the game size based on viewport
 function getGameSize() {
@@ -16,8 +20,14 @@ const config = {
     parent: 'game-container',
     width: gameSize.width,
     height: gameSize.height,
-    backgroundColor: '#076324', // Green felt color
-    scene: ClockSolitaire,
+    backgroundColor: '#000000', // Green felt color
+    scene: [
+        Boot,
+        Preloader,
+        MainMenu,
+        Game,
+        GameOver
+    ],
     physics: {
         default: 'arcade',
         arcade: {

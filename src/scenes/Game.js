@@ -3,12 +3,12 @@ import Deck from "../deck.js";
 import Clock from "../clock.js";
 import Card from "../card.js";
 
-export default class ClockSolitaire extends Phaser.Scene {
+export class Game extends Phaser.Scene {
     constructor() {
-        super({key: 'ClockSolitaire'});
+        super({key: 'Game'});
     }
 
-    preload() {
+    NO_preload() {
         // Create loading bar
         let progressBar = this.add.graphics();
         let progressBox = this.add.graphics();
