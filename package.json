@@ -1,0 +1,36 @@
+{
+  "name": "tiktok",
+  "productName": "tiktok",
+  "description": "TikTok Game",
+  "version": "0.0.1",
+  "main": "index.html",
+  "type": "module",
+  "window": {
+    "title": "TikTok",
+    "width": 800,
+    "height": 800,
+    "fullscreen": false,
+    "toolbar": false,
+    "icon": "customIcon.png"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davelpz/tiktok"
+  },
+  "author": "David Lopez <davelpz@me.com>",
+  "license": "MIT",
+  "licenseUrl": "http://www.opensource.org/licenses/mit-license.php",
+  "scripts": {
+    "dev": "node log.js dev & vite --config vite/config.dev.mjs",
+    "build": "node log.js build & vite build --config vite/config.prod.mjs",
+    "dev-nolog": "vite --config vite/config.dev.mjs",
+    "build-nolog": "vite build --config vite/config.prod.mjs"
+  },
+  "devDependencies": {
+    "terser": "^5.31.0",
+    "vite": "^5.3.1"
+  },
+  "dependencies": {
+    "phaser": "^3.86.0"
+  }
+}
