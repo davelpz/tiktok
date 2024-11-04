@@ -109,6 +109,7 @@ export default class Clock {
                 if (position === 13 && index === cards.length - 1) {
                     card.enableDragging(); // Enable dragging for the top card
                     card.flip();  // Flip it face up so we can see what it is
+                    this.cycleCorrectCardsToBottom(cards, position, pos);
                     //console.log('Made card draggable:', card.suit, card.value);
                     //console.log('Card interactive state:', card.input.draggable);  // Add this line
                 }
