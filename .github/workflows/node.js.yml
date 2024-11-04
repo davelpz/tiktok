@@ -5,9 +5,9 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "phaser" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "phaser" ]
+    branches: [ "main" ]
 
 jobs:
   build:
