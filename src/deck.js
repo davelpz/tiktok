@@ -108,7 +108,7 @@ export default class Deck {
         }
 
         // Update all cards' positions
-        this.cards.forEach((card, index) => {
+        this.cards.forEach((card) => {
             card.setPosition(this.deckX, this.deckY);
             card.setHomePosition(this.deckX, this.deckY);
             // Bring later cards to top of the display list
