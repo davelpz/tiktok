@@ -83,6 +83,7 @@ export default class Card extends Phaser.GameObjects.Container {
         // Store current scale
         const currentScaleX = this.scaleX;
         const currentScaleY = this.scaleY;
+        this.isFaceUp = !this.isFaceUp;
 
         this.scene.tweens.add({
             targets: this,
@@ -90,7 +91,6 @@ export default class Card extends Phaser.GameObjects.Container {
             duration: 150,
             ease: 'Linear',
             onComplete: () => {
-                this.isFaceUp = !this.isFaceUp;
                 this.front.setVisible(this.isFaceUp);
                 this.back.setVisible(!this.isFaceUp);
 
