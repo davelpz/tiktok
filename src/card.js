@@ -82,7 +82,7 @@ export default class Card extends Phaser.GameObjects.Container {
 
         // Store current scale
         const currentScaleX = this.scaleX;
-        const currentScaleY = this.scaleY;
+        // const currentScaleY = this.scaleY;
         this.isFaceUp = !this.isFaceUp;
 
         this.scene.tweens.add({
