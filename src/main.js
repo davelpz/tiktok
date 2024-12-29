@@ -15,11 +15,15 @@ function getGameSize() {
 }
 
 const gameSize = getGameSize();
+
+const width = gameSize.width;
+const height = width * (16/9);
+//console.log(width, height);
 const config = {
     type: Phaser.AUTO,
     parent: 'game-container',
-    width: gameSize.width,
-    height: gameSize.height,
+    width: width,
+    height: height,
     backgroundColor: '#000000', // Green felt color
     scene: [
         Boot,
@@ -34,6 +38,10 @@ const config = {
             debug: false,
             gravity: {y: 0} // No gravity needed for cards
         }
+    },
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
     }
 };
 
@@ -41,6 +49,20 @@ const game = new Phaser.Game(config);
 
 // Handle responsive resizing
 window.addEventListener('resize', () => {
-    const newSize = getGameSize();
-    game.scale.resize(newSize.width, newSize.height);
+    if (window.innerWidth < window.innerHeight) {
+        let gameSize = getGameSize();
+        let width = gameSize.width;
+        let height = width * (16/9);
+        //console.log(width, height);
+        game.scale.resize(width, height);
+        game.scale.refresh();
+    } else {
+        let gameSize = getGameSize();
+        let height = gameSize.height;
+        let width = height * (16/9);
+        //console.log(width, height);
+        game.scale.resize(width, height);
+        game.scale.refresh();
+    }
+
 });

@@ -10,14 +10,11 @@ export class MainMenu extends Scene
 
     create ()
     {
-        let width = this.cameras.main.width;
-        let height = this.cameras.main.height;
+        this.background = this.add.image(0, 0, 'background').setOrigin(0.5);
+        this.logo = this.add.image(0, 0, 'logo').setOrigin(0.5).setScale(0.20);
 
-        this.add.image(width/2, height/2, 'background');
-
-        let logo = this.add.image(width/2, height/2, 'logo');
-        // Shrink the image by 1/4
-        logo.setScale(0.25);
+        this.scale.on('resize', this.resizeBackground, this);
+        this.resizeBackground();
 
         // this.add.text(width/2, height/2 + 300, 'Start', {
         //     fontFamily: 'Arial Black', fontSize: 38, color: '#ffffff',
@@ -30,5 +27,16 @@ export class MainMenu extends Scene
             this.scene.start('Game');
 
         });
+    }
+
+    resizeBackground ()
+    {
+        let width = this.scale.width;
+        let height = this.scale.height;
+//console.log(width, height);
+        this.background.setPosition(width / 2, height / 2);
+        this.background.setDisplaySize(width, height);
+
+        this.logo.setPosition(width / 2, height / 2);
     }
 }
