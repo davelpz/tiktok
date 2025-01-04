@@ -9,6 +9,9 @@ export class Game extends Phaser.Scene {
     }
 
     create() {
+        this.background = this.add.image(0, 0, 'background').setOrigin(0.5);
+        this.resizeBackground();
+
         // Create deck slightly off-center
         this.deck = new Deck(
             this,
@@ -89,7 +92,7 @@ export class Game extends Phaser.Scene {
 
     displayWinMessage() {
         const winText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 'You Win!', {
-            fontSize: '48px',
+            fontSize: '64px',
             color: '#00FF00'
         });
         winText.setOrigin(0.5);
@@ -98,10 +101,19 @@ export class Game extends Phaser.Scene {
 
     displayLossMessage() {
         const lossText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, 'Game Over', {
-            fontSize: '48px',
+            fontSize: '64px',
             color: '#FF0000'
         });
         lossText.setOrigin(0.5);
         lossText.setDepth(10);  // Ensure text is on top of all other elements
+    }
+
+    resizeBackground ()
+    {
+        let width = this.scale.width;
+        let height = this.scale.height;
+//console.log(width, height);
+        this.background.setPosition(width / 2, height / 2);
+        this.background.setDisplaySize(width, height);
     }
 }

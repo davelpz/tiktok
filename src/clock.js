@@ -76,11 +76,11 @@ export default class Clock {
             const pos = this.positions.get(i);
 
             // Calculate scaled dimensions
-            const scaledWidth = 234 * this.cardScale * 1.1;
-            const scaledHeight = 333 * this.cardScale * 1.1;
+            const scaledWidth = 234 * this.cardScale;
+            const scaledHeight = 333 * this.cardScale;
 
             // Create drop zone rectangle with correct card dimensions
-            const zone = this.scene.add.rectangle(pos.x, pos.y, scaledWidth, scaledHeight, 0x00FF00, 1);
+            const zone = this.scene.add.rectangle(pos.x, pos.y, scaledWidth, scaledHeight, 0x222222, 1);
 
             //console.log('Drop zone set interactive for position:', i);
 

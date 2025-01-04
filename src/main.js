@@ -15,9 +15,9 @@ function getGameSize() {
 }
 
 const gameSize = getGameSize();
-
+const aspectRatio = 16/9;
 const width = gameSize.width;
-const height = width * (16/9);
+const height = width * aspectRatio;
 //console.log(width, height);
 const config = {
     type: Phaser.AUTO,
@@ -52,14 +52,14 @@ window.addEventListener('resize', () => {
     if (window.innerWidth < window.innerHeight) {
         let gameSize = getGameSize();
         let width = gameSize.width;
-        let height = width * (16/9);
+        let height = width * aspectRatio;
         //console.log(width, height);
         game.scale.resize(width, height);
         game.scale.refresh();
     } else {
         let gameSize = getGameSize();
         let height = gameSize.height;
-        let width = height * (16/9);
+        let width = height * aspectRatio;
         //console.log(width, height);
         game.scale.resize(width, height);
         game.scale.refresh();
